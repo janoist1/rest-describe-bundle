@@ -12,11 +12,11 @@ class DescribeOperationProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testSupports()
     {
-        $resource = new Entity\Resource('Test res');
-        $describeOperation = new Describe\Operation(array());
-        $entityOperation = new Entity\Operation('Test op', $resource);
-        $describeProperty = new Describe\Property(array());
-        $entityProperty = new Entity\Property('Test prop', $resource);
+        $resource = $this->getMock('Sheppers\RestDescribeBundle\Entity\Resource', array(), array('Test res'));
+        $describeOperation = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Operation', array(), array(array()));
+        $entityOperation = $this->getMock('Sheppers\RestDescribeBundle\Entity\Operation', array(), array('Test op', $resource));
+        $describeProperty = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Property', array(), array(array()));
+        $entityProperty = $this->getMock('Sheppers\RestDescribeBundle\Entity\Property', array(), array('Test prop', $resource));
         $processor = $this->getProcessor();
 
         $this->assertTrue($processor->supports($describeOperation, $entityOperation));
@@ -25,8 +25,8 @@ class DescribeOperationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
-        $request = new Describe\Request(array());
-        $response = new Describe\Response(array());
+        $request = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Request', array(), array(array()));
+        $response = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Response', array(), array(array()));
         $mockOptions = array(
             'description' => 'Test description',
             'name' => 'Test name',
@@ -42,10 +42,12 @@ class DescribeOperationProcessorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getMethods', 'getPath'))
             ->getMock();
-        $route->expects($this->once())
+        $route
+            ->expects($this->once())
             ->method('getMethods')
             ->will($this->returnValue(array('POST')));
-        $route->expects($this->once())
+        $route
+            ->expects($this->once())
             ->method('getPath')
             ->will($this->returnValue('/test/path'));
         $mockMeta = array(
@@ -56,7 +58,7 @@ class DescribeOperationProcessorTest extends \PHPUnit_Framework_TestCase
             'uri' => 'Test uri',
             'route' => $route,
         );
-        $resource = new Entity\Resource('Test res');
+        $resource = $this->getMock('Sheppers\RestDescribeBundle\Entity\Resource', array(), array('Test res'));
         $operation = new Entity\Operation('Test op', $resource);
         $operation2 = new Entity\Operation('Test op', $resource);
         $operation2
@@ -76,8 +78,8 @@ class DescribeOperationProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testGetNestedAnnotations()
     {
-        $request = new Describe\Request(array());
-        $response = new Describe\Response(array());
+        $request = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Request', array(), array(array()));
+        $response = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Response', array(), array(array()));
         $annotation1 = new Describe\Operation(array(
             'request' => $request,
             'response' => $response,

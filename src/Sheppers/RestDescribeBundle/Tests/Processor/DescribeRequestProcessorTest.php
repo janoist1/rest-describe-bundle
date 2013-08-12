@@ -14,11 +14,11 @@ class DescribeRequestProcessorTest extends \PHPUnit_Framework_TestCase
     public function testSupports()
     {
         $processor = $this->getProcessor();
-        $resource = new Entity\Resource('Test res');
-        $describeRequest = new Describe\Request(array());
-        $entityOperation = new Entity\Operation('Test op', $resource);
-        $describeProperty = new Describe\Property(array());
-        $entityProperty = new Entity\Property('Test prop', $resource);
+        $resource = $this->getMock('Sheppers\RestDescribeBundle\Entity\Resource', array(), array('Test res'));
+        $describeRequest = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Request', array(), array(array()));
+        $entityOperation = $this->getMock('Sheppers\RestDescribeBundle\Entity\Operation', array(), array('Test op', $resource));
+        $describeProperty = $this->getMock('Sheppers\RestDescribeBundle\Annotation\Describe\Property', array(), array(array()));
+        $entityProperty = $this->getMock('Sheppers\RestDescribeBundle\Entity\Property', array(), array('Test prop', $resource));
 
         $this->assertTrue($processor->supports($describeRequest, $entityOperation));
         $this->assertFalse($processor->supports($describeProperty, $entityProperty));
@@ -26,7 +26,39 @@ class DescribeRequestProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testProcess()
     {
+        $processor = $this->getProcessor();
+        $describeRequest = $this->getMock(
+            'Sheppers\RestDescribeBundle\Annotation\Describe\Request',
+            array('getModel', 'getParameters'),
+            array(array()));
+        $describeRequest
+            ->expects($this->once())
+            ->method('getModel')
+            ->will($this->returnValue(null));
+        $describeRequest
+            ->expects($this->once())
+            ->method('getParameters')
+            ->will($this->returnValue(null));
+        $resource = $this->getMock('Sheppers\RestDescribeBundle\Entity\Resource', array(), array('Test res'));
+        $entityOperation = $this->getMock('Sheppers\RestDescribeBundle\Entity\Operation', array(), array('Test op', $resource));
+        $route = $this
+            ->getMockBuilder('Symfony\Component\Routing\Route')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMethods', 'getPath'))
+            ->getMock();
+        $route
+            ->expects($this->once())
+            ->method('getMethods')
+            ->will($this->returnValue(array('POST')));
+        $route
+            ->expects($this->once())
+            ->method('getPath')
+            ->will($this->returnValue('/test/path'));
+        $meta = array(
+            'route' => $route
+        );
 
+        $processor->process($describeRequest, $entityOperation, $meta);
     }
 
     protected function getProcessor()
